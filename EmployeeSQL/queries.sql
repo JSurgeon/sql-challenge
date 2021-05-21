@@ -45,25 +45,6 @@ WHERE first_name = 'Hercules' AND last_name LIKE 'B%';
 
 ------------------------------------------------------------------------------------------------------------------------------------------
 -- List all employees in the Sales department, including their employee number, last name, first name, and department name.
-CREATE VIEW sales_employees AS
-SELECT e.emp_no AS "Employee Number", e.first_name AS "First Name", e.last_name AS "Last Name", d.dept_name AS "Department"
-FROM employees e
-WHERE emp_no IN
-(	
-	SELECT emp_no
-	FROM dept_emp de
-	WHERE dept_no IN 
-	(
-		SELECT dept_no
-		FROM departments AS d
-		WHERE dept_name = 'Sales'
-	)
-);
---check count to validate
-SELECT COUNT(*)
-FROM sales_employees
-
-		-- same as above, but as a join 
 CREATE VIEW sales_employees_join AS
 SELECT e.emp_no AS "Employee Number", e.first_name AS "First Name", e.last_name AS "Last Name", d.dept_name as "Department"
 FROM employees e
@@ -74,25 +55,22 @@ INNER JOIN departments d
 WHERE dept_name = 'Sales';
 --check count to validate
 SELECT COUNT(*)
-FROM sales_employees_join
+FROM sales_employees_join;
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------
 -- List all employees in the Sales and Development departments, including their employee number, last name, first name, and department name.
-SELECT emp_no AS "Employee Number", first_name AS "First Name", last_name AS "Last Name" -- , d.dept_name as "Department"
-FROM employees
-WHERE emp_no IN
-(	
-	SELECT emp_no
-	FROM dept_emp
-	WHERE dept_no IN 
-	(
-		SELECT dept_no
-		FROM departments d
-		WHERE dept_name = 'Sales' OR dept_name = 'Development'
-	)
-);
-
+CREATE VIEW sales_and_development_employees_join AS
+SELECT e.emp_no AS "Employee Number", e.first_name AS "First Name", e.last_name AS "Last Name", d.dept_name as "Department"
+FROM employees e
+INNER JOIN dept_emp de
+	ON (e.emp_no=de.emp_no)
+INNER JOIN departments d
+	ON (de.dept_no=d.dept_no)
+WHERE dept_name = 'Sales' OR dept_name = 'Development';
+--check count to validate
+SELECT COUNT(*)
+FROM sales_and_development_employees_join;
 ------------------------------------------------------------------------------------------------------------------------------------------
 -- In descending order, list the frequency count of employee last names, i.e., how many employees share each last name.
 SELECT last_name AS "Last Name", COUNT(last_name) AS "Count"
